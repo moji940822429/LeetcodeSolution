@@ -3,6 +3,7 @@
  */
 
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -89,6 +90,89 @@ public class Solution {
         }
         return Math.min(dp[len - 1], dp[len - 2]);
     }
+
+    //最长回文子串【解决最优子结构问题】,建立Dp数组记录状态
+    public String longestPalindrome(String s) {
+        int len = s.length();
+        if(len<=1){
+            return s;
+        }
+        //回文串长度
+        int longestPalindrome = 1;
+        //如果没有回文串取第一个字母作为输出结果
+        String longestPalindromeStr = s.substring(0,1);
+        //创建dp数组
+        boolean[][] dp = new boolean[len][len];
+        //从前往后一点一点的找回文串
+        for(int r=1;r<len;r++){
+            for(int l=0;l<r;l++){
+                if(s.charAt(l)==s.charAt(r) && (r-l<=2 || dp[l+1][r-1])){
+                    dp[l][r] = true;
+                    if(r-l+1>longestPalindrome){
+                        longestPalindrome = r-l+1;
+                        longestPalindromeStr = s.substring(l,r+1);
+                    }
+                }
+
+            }
+        }
+        return longestPalindromeStr;
+    }
+
+    //一个机器人位于一个 m x n 网格的左上角,机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角,问总共有多少条不同的路径？
+
+    /**
+     * 二维数组的动态规划
+     *  到达位置(i,j) ，只有两条路，从(i-1,j)到达(i,j)，和从(i,j-1)到达(i,j)。
+     * 因此有,d[i][j] = d[i-1][j] + d[i][j-1]。
+     * 参考跳楼梯，从a[0][0]开始，有a[0][1]/a[1][0]两种
+     * 动态方程：dp[i][j] = dp[i-1][j] + dp[i][j-1]
+     * 需要一个dp数组记录状态
+     */
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        //初始化dp数组
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        for (int j = 0; j<n; j++){
+            dp[0][j] = 1;
+        }
+        //实现动态方程
+        for (int i = 1;i < m; i++){
+            for (int j = 1; j < n;j++){
+                dp[i][j] = dp[i-1][j]+dp[i][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+    //空间优化，从二维数组变为两个一维数组
+    public int uniquePaths2(int m, int n){
+        int[] pre = new int[n];
+        int[] curr = new int[n];
+        //初始化
+        Arrays.fill(pre,1);
+        Arrays.fill(curr,1);
+        for (int i=1; i<m;i++) {
+            for (int j = 1;j<n;j++){
+                curr[j] = curr[j-1]+pre[j];
+            }
+            pre = curr.clone();
+        }
+        return curr[n-1];
+    }
+    //空间继续优化，只用一个一维数组记录状态
+    public int uniquePaths3(int m, int n){
+        int[] dp = new int[n];
+        Arrays.fill(dp,1);
+        for(int i = 1; i < m; i++){
+            for (int j = 1; j<n; j++){
+                dp[j] = dp[j] + dp[j-1];
+            }
+        }
+        return dp[n-1];
+    }
+
 
 
 }
